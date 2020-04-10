@@ -1,16 +1,14 @@
 import * as React from 'react';
+import { Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
+import HistoryScreen from '../screens/HistoryScreen';
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
-
-export default function BottomTabNavigator({ navigation, route }) {
-  // Set the header title on the parent stack navigator depending on the
-  // currently active tab. Learn more in the documentation:
-  // https://reactnavigation.org/docs/en/screen-options-resolution.html
+const _os = Platform.OS;
+export default function BottomTabNavigator({ navigation, route }) {  
   navigation.setOptions({ headerTitle: getHeaderTitle(route) });
 
   return (
@@ -19,16 +17,16 @@ export default function BottomTabNavigator({ navigation, route }) {
         name="Home"
         component={HomeScreen}
         options={{
-          title: 'Get Started',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-code-working" />,
+          title: 'Khám Phá',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name={_os == 'ios' ? 'ios-search' : 'md-search'} />,
         }}
       />
       <BottomTab.Screen
-        name="Links"
-        component={LinksScreen}
+        name="History"
+        component={HistoryScreen}
         options={{
-          title: 'Resources',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-book" />,
+          title: 'Lịch Sử',
+          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name={_os == 'ios' ? 'ios-save' : 'md-save'} />,
         }}
       />
     </BottomTab.Navigator>
@@ -40,8 +38,8 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case 'Home':
-      return 'How to get started';
-    case 'Links':
-      return 'Links to learn more';
+      return null;
+    case 'History':
+      return null;
   }
 }
