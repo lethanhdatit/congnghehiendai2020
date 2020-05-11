@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "SGU Map",
-    "slug": "SGU Map",
+    "slug": "sgu-map",
     "privacy": "public",
     "sdkVersion": "36.0.0",
     "platforms": [
@@ -25,7 +25,24 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sgu.map",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This permission is not needed by the app, but it is required by an underlying API. If you see this dialog, contact us."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyDp_M5MMEdwOPqrWVAaBxboZSksF_OqnWs"
+      }
+    },
+    "android": {
+      "package": "com.sgu.map",
+      "versionCode": 1,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA7S9qHkftiy_T3JnSltsghThZ_gbfptug"
+        }
+      }
     }
   }
 }
