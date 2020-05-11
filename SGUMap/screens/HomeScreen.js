@@ -3,23 +3,22 @@ import { StyleSheet, Text, View, Dimensions, AppState } from 'react-native';
 import MapCustom from '../components/MapCustom';
 import GetCurrentLocation from '../components/LocationCustom';
 
-const defaultRegion = {
-  latitude: 37.321996988,
-  longitude: -122.0325472123455,
-  latitudeDelta: 0.0922,
-  longitudeDelta: 0.0421
-}
-
 const deltas = {
   latitudeDelta: 0.0922,
   longitudeDelta: 0.0421
 };
 
+const defaultRegion = {
+  latitude: 37.321996988,
+  longitude: -122.0325472123455,
+  ...deltas
+}
+
 export default class HomeScreen extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      appState: AppState.currentState,
+      appState: AppState.currentState,      
       region: null,
       somePlaces: [], //markers
     }
@@ -27,7 +26,7 @@ export default class HomeScreen extends React.Component {
 
   async onGetCurrentLocation() {
     var _cRegion  = await GetCurrentLocation(deltas);
-    this.setState({region: _cRegion});
+    this.setState({ region: _cRegion });
   }
 
   componentDidMount() { 
@@ -50,7 +49,7 @@ export default class HomeScreen extends React.Component {
   render() {
     return (
       <View style={styles.container}>
-        <MapCustom
+        <MapCustom          
           region={this.state.region ?? defaultRegion}
           places={this.state.somePlaces}
         />

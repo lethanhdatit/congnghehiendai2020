@@ -38,8 +38,8 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case 'Home':
-      return null;
+      return "Bản Đồ";
     case 'History':
-      return null;
+      return "Gần Đây";
   }
 }
