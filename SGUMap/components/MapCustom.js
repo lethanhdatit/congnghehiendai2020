@@ -1,11 +1,28 @@
 import * as React from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, AnimatedRegion, Animated } from 'react-native-maps';
 
+// tốc độ lướt tự động trên bản đồ
+const SPEED_JUMP_ON_MAP = 1000;
 export default class MapCustom extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { }
+    this.state = {
+      //region: null
+    }
+  }
+
+  componentDidUpdate = () => {    
+    this.onJumpAnimateTo(this.props.region);    
+  }
+
+  onJumpAnimateTo(region) {    
+    this.map.animateToRegion(region, SPEED_JUMP_ON_MAP);
+  }
+
+  onRegionChange(region) {    
+    this.props.currentRegion(region);
+    // todo
   }
 
   renderMarkers() {
@@ -14,22 +31,19 @@ export default class MapCustom extends React.Component {
     ))
   }
 
-  onRegionChange(region) {
-    console.log(region);
-    this.setState({ region: region });
-  }
-
-  render() {  
+  render() {   
     return (
       <View style={styles.container}>
         <MapView
           style={styles.mapStyle}          
-          region={this.props.region}
+          initialRegion = {this.props.initialRegion}
           onRegionChange={this.onRegionChange.bind(this)}
           showsUserLocation
           showsMyLocationButton
+          animateToRegion
+          ref={ref => { this.map = ref; }}
         >
-          {this.renderMarkers()}
+          {this.renderMarkers()}         
         </MapView>
       </View>
     );
