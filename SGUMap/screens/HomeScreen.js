@@ -26,7 +26,17 @@ export default class HomeScreen extends React.Component {
       somePlaces: [], //markers
       region: null,     
       search: '',
-      targetRegion: null
+      targetRegion: null,
+      coordinates: [
+				{
+          "latitude": 10.802833237823988,          
+          "longitude": 106.70926147909701,
+				},
+				{
+          "latitude": 10.776145446015011,        
+          "longitude": 106.70253285359789,          
+				},
+			],
     }
   }
 
@@ -64,6 +74,7 @@ export default class HomeScreen extends React.Component {
           region={this.state.region}
           places={this.state.somePlaces}
           currentRegion={(currentRegion) => /*console.log(currentRegion)*/ null}
+          coordinates={this.state.coordinates}
         />
 
         <SearchBar
