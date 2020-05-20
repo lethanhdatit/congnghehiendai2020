@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
-import MapView, { Marker} from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 
 import MapViewDirections from 'react-native-maps-directions';
 //import MapViewDirections from './MapViewDirections';
@@ -29,13 +29,7 @@ export default class MapCustom extends React.Component {
     // todo
   }
 
-  renderMarkers() {
-    return this.props.places.map((place, i) => (
-      <Marker key={i} title={place.name} coordinate={place.coords} />
-    ))
-  }
-
-  onReady = (result) => {
+  onDirectionReady = (result) => {
     console.log(`Distance: ${result.distance} km`)
     console.log(`Duration: ${result.duration} min.`)
 
@@ -47,15 +41,41 @@ export default class MapCustom extends React.Component {
         top: (styles.mapStyle.height / 20),
       }
     });
-  
+
   }
 
-  onError = (errorMessage) => {
+  onDirectionError = (errorMessage) => {
     console.log(errorMessage);
   }
 
-  render() {
+  renderMarkers() {
+    var place = this.props.places;
+    return <Marker title={"Test"} coordinate={place} />
+  }
+
+  renderMapViewDirections() {
     var coordinates = this.props.coordinates;
+    return  (coordinates.length >= 2) 
+            ?
+            <MapViewDirections
+              origin={coordinates[0]}
+              destination={coordinates[coordinates.length - 1]}
+              apikey={GOOGLE_MAPS_APIKEY}
+              strokeWidth={3}
+              strokeColor="#518EFB" //Mau giong cua google map //color line: 518EFB //border color: 506BD0
+              waypoints={coordinates.slice(1, -1)}
+              optimizeWaypoints={true}
+              onStart={(params) => {
+                console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
+              }}
+              onReady={this.onDirectionReady}
+              onError={this.onDirectionError}              
+            /> 
+            :
+            null
+  }
+
+  render() {
     return (
       <View style={styles.container}>
         <MapView
@@ -67,23 +87,8 @@ export default class MapCustom extends React.Component {
           animateToRegion
           ref={ref => { this.map = ref; }}
         >
-          {this.renderMarkers()}         
-          {(coordinates.length >= 2) && (
-            <MapViewDirections
-              origin={coordinates[0]}            
-              destination={coordinates[coordinates.length - 1]}
-              apikey={GOOGLE_MAPS_APIKEY}
-              strokeWidth={3}
-              strokeColor="hotpink"
-              //waypoints={(coordinates.length > 2) ? coordinates.slice(1, -1) : null}
-              optimizeWaypoints={true}
-              onStart={(params) => {
-                console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
-              }}
-              onReady={this.onReady}
-              onError={this.onError}  
-            />
-          )}
+          {this.renderMarkers()}
+          {this.renderMapViewDirections()}
         </MapView>
       </View>
     );

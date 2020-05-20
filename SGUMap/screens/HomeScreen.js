@@ -72,7 +72,7 @@ export default class HomeScreen extends React.Component {
         <MapCustom
           initialRegion={this.state.region ?? defaultRegion}
           region={this.state.region}
-          places={this.state.somePlaces}
+          places={this.state.coordinates[1]}
           currentRegion={(currentRegion) => /*console.log(currentRegion)*/ null}
           coordinates={this.state.coordinates}
         />
