@@ -5,7 +5,7 @@ import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import * as NotificationCustom from './components/NotificationCustom';
+import * as NotificationCustom from './components/Notification';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 
 const Stack = createStackNavigator();
@@ -95,7 +95,7 @@ async function loadResourcesAsync() {
 function handleLoadingError(error) {
   // In this case, you might want to report the error to your error reporting
   // service, for example Sentry
-  console.warn(error);
+  console.warn(JSON.stringify(error));
 }
 
 const styles = StyleSheet.create({

@@ -40,13 +40,15 @@ export default class MyMapView extends React.Component {
     }
 
     render() {
-        const { region, originRegion, destinationRegion, isStartDirection } = this.props;
+        const { region, originRegion, destinationRegion, isStartDirection, followsUserLocation } = this.props;
         return (
             <MapView
-                style={styles.mapStyle}              
+                style={styles.mapStyle}
                 initialRegion={region}
                 showsUserLocation={true}
-                //animateToRegion={true}
+                followsUserLocation={followsUserLocation}
+                //onRegionChange={(r) => console.log(r)}
+                loadingEnabled={true}
                 ref={ref => { this.map = ref; }}
             >
                 {
@@ -59,6 +61,8 @@ export default class MyMapView extends React.Component {
                         origin={originRegion}
                         destination={destinationRegion}
                         apikey={config.GOOGLE_MAPS_APIKEY}
+                        precision='high'
+                        timePrecision='now'
                         strokeWidth={3}
                         strokeColor="#518EFB" //Mau giong cua google map //color line: 518EFB //border color: 506BD0                        
                         optimizeWaypoints={true}
@@ -77,7 +81,8 @@ export default class MyMapView extends React.Component {
 
 const styles = StyleSheet.create({
     mapStyle: {
+        flex: 1,
         width: Dimensions.get('window').width,
-        height: Dimensions.get('window').height,
+        height: Dimensions.get('window').height
     },
 });

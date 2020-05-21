@@ -1,7 +1,7 @@
 import {
   AsyncStorage
 } from "react-native";
-import config from './config';
+import config from '../config';
 
 export const storeKeyData = async (key, value) => {
   try {
@@ -10,6 +10,7 @@ export const storeKeyData = async (key, value) => {
     console.log(error);
   }
 };
+
 export const getValueByKey = async (key) => {
   return await AsyncStorage.getItem(key);
 }

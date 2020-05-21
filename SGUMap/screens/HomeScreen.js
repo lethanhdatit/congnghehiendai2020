@@ -2,12 +2,12 @@ import React from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Image, AppState } from 'react-native';
 import MapInput from '../components/MapInput';
 import MyMapView from '../components/MapView';
-import GetCurrentLocation from '../components/LocationCustom';
+import GetCurrentLocation from '../components/Location';
 
 // Độ zoom trên map
 const deltas = {
-    latitudeDelta: 0.0922,
-    longitudeDelta: 0.0421
+    "latitudeDelta": 0.007427427841413703,
+    "longitudeDelta": 0.005128034824508632,
 };
 //vị trí mặc định (tọa độ + độ zoom) nếu k lấy đc vị trí hiện tại, chổ này là nhà t ở Bình Thạnh :)))
 const defaultRegion = {
@@ -25,7 +25,8 @@ class MapContainer extends React.Component {
             region: null,
             originRegion: null,
             destinationRegion: null,
-            isStartDirection: false
+            isStartDirection: false,
+            followsUserLocation: false
         };
     }
 
@@ -50,7 +51,7 @@ class MapContainer extends React.Component {
         var _cRegion = await GetCurrentLocation(deltas);
         this.setState({ region: _cRegion ?? defaultRegion });
     }
-   
+
     getCoordsFromName(loc) {
         var _destinationRegion = {
             latitude: loc.lat,
@@ -77,17 +78,20 @@ class MapContainer extends React.Component {
     onTestPushNotification = async () => {
         await NotificationCustom._onPushNotificationInternal("Đây là tiêu đề", "Đây là nội dung thông báo");
     }
-    
+
     render() {
         return (
             <View style={styles.container}>
 
-                <MyMapView
-                    region={this.state.region ?? defaultRegion}
-                    originRegion={this.state.originRegion}
-                    destinationRegion={this.state.destinationRegion}
-                    isStartDirection={this.state.isStartDirection}
-                />
+                <View style={styles.mapViewContainer}>
+                    <MyMapView
+                        region={this.state.region ?? defaultRegion}
+                        originRegion={this.state.originRegion}
+                        destinationRegion={this.state.destinationRegion}
+                        isStartDirection={this.state.isStartDirection}
+                        followsUserLocation={this.state.followsUserLocation}
+                    />
+                </View>
 
                 <View style={styles.searchBarContainer}>
                     <MapInput notifyChange={(loc) => this.getCoordsFromName(loc)} />
@@ -98,13 +102,13 @@ class MapContainer extends React.Component {
                         style={styles.gpsButton}
                         onPress={() => null}
                     >
-                        <Text style={styles.gpsImgButton}>Push</Text>
+                        <Text style={styles.gpsImgButton}>P</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.gpsButton}
                         onPress={() => this.onStartDirection()}
                     >
-                        <Text style={styles.gpsImgButton}>Đ</Text>
+                        <Text style={styles.gpsImgButton}>C</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                         style={styles.gpsButton}
@@ -125,7 +129,10 @@ class MapContainer extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: '#fff'
+    },
+    mapViewContainer: {
+        flex: 1
     },
     gpsButtonContainer: {
         flex: 1,
@@ -159,21 +166,8 @@ const styles = StyleSheet.create({
         top: 0,
         left: 0,
         width: Dimensions.get('window').width,
-        backgroundColor: 'transparent',
-        borderBottomColor: 'transparent',
-        borderTopColor: 'transparent',
-    },
-    searchBarinputContainer: {
-        backgroundColor: '#ffffff',
-        shadowColor: 'rgba(0,0,0, .4)',
-        shadowOffset: { height: 1, width: 1 },
-        shadowOpacity: 1,
-        shadowRadius: 1,
-    },
-    mapViewContainer: {
-        flex: 1,
-
-    },
+        backgroundColor: 'transparent'
+    },   
 });
 
 export default MapContainer;
