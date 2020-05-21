@@ -1,55 +1,101 @@
 import * as React from 'react';
-import { Platform, StatusBar, StyleSheet, View } from 'react-native';
-import { SplashScreen } from 'expo';
+import { Platform, StatusBar, StyleSheet, AppState, SafeAreaView, Alert } from 'react-native';
+import { AppLoading, Notifications } from 'expo';
 import * as Font from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
+import * as NotificationCustom from './components/NotificationCustom';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 
 const Stack = createStackNavigator();
 
-export default function App(props) {
-  const [isLoadingComplete, setLoadingComplete] = React.useState(false);
-  const [initialNavigationState] = React.useState();
-  const containerRef = React.useRef();  
+export default class App extends React.Component {
+  _isMounted = false;
 
-  // Load any resources or data that we need prior to rendering the app
-  React.useEffect(() => {
-    async function loadResourcesAndDataAsync() {
-      try {        
-        // Load fonts
-        await Font.loadAsync({
-          ...Ionicons.font,
-          'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
-        });
-      } catch (e) {
-        // We might want to provide this error information to an error reporting service
-        console.warn(e);
-      } finally {
-        setLoadingComplete(true);
-        SplashScreen.hide();
-      }
-    }
-
-    loadResourcesAndDataAsync();
-  }, []);
-
-  if (!isLoadingComplete && !props.skipLoadingScreen) {
-    return null;
-  } else {
-    return (
-      <View style={styles.container}>
-        {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-        <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-          <Stack.Navigator>
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </View>
-    );
+  constructor(props) {
+    super(props);
+    this.state = {
+      appState: AppState.currentState,
+      showHeader: false,
+      isLoadingComplete: false
+    };
   }
+
+  componentDidMount() {
+    this._isMounted = true;
+    AppState.addEventListener('change', this._handleAppStateChange);
+    NotificationCustom._onRequestNotificationsAsync();
+    this._notificationSubscription = Notifications.addListener(this._handleNotification);
+  }
+
+  componentWillUnmount() {
+    AppState.removeEventListener('change', this._handleAppStateChange);
+    this._notificationSubscription.remove();
+  }
+
+  _handleNotification = (notification) => {    
+    Alert.alert(
+      notification.data.title,
+      notification.data.body,
+      [
+        {
+          text: "OK",
+          style: "default"
+        }
+      ],
+      { cancelable: true }
+    );
+  };
+
+  _handleAppStateChange = nextAppState => {
+    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+      NotificationCustom._onRequestNotificationsAsync();
+    }
+    this.setState({ appState: nextAppState });
+  };
+  
+  render() {
+    if (!this.state.isLoadingComplete) {
+      return (
+        <AppLoading
+          startAsync={loadResourcesAsync}
+          onError={handleLoadingError}
+          onFinish={() => this._isMounted && this.setState({ isLoadingComplete: true })}
+        />
+      );
+    } 
+    else {
+      return (
+        <SafeAreaView style={styles.container}>
+          {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen name="Root" component={BottomTabNavigator} />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </SafeAreaView>
+      );
+    }
+  }
+}
+
+async function loadResourcesAsync() {
+  await Promise.all([
+    Font.loadAsync({
+      // This is the font that we are using for our tab bar
+      ...Ionicons.font,
+      // We include SpaceMono because we use it in HomeScreen.js. Feel free to
+      // remove this if you are not using it in your app
+      'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+    }),
+  ]);
+}
+
+function handleLoadingError(error) {
+  // In this case, you might want to report the error to your error reporting
+  // service, for example Sentry
+  console.warn(error);
 }
 
 const styles = StyleSheet.create({

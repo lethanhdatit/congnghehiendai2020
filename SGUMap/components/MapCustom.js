@@ -1,13 +1,12 @@
 import * as React from 'react';
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-
 import MapViewDirections from 'react-native-maps-directions';
-//import MapViewDirections from './MapViewDirections';
+import config from "../config";
 
 // tốc độ lướt tự động trên bản đồ
-const SPEED_JUMP_ON_MAP = 1000;
-const GOOGLE_MAPS_APIKEY = "AIzaSyA8KCMyEzE7fg3ZXUDFh-eFp-FB9c4u_x8";
+const SPEED_JUMP_ON_MAP = config.SPEED_JUMP_ON_MAP;
+const GOOGLE_MAPS_APIKEY = config.GOOGLE_MAPS_APIKEY;
 export default class MapCustom extends React.Component {
   constructor(props) {
     super(props);

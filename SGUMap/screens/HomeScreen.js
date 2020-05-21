@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Dimensions, AppState, TouchableOpacity, Image }
 import MapCustom from '../components/MapCustom';
 import GetCurrentLocation from '../components/LocationCustom';
 import { SearchBar } from 'react-native-elements';
-
+import * as NotificationCustom from '../components/NotificationCustom';
 // Độ zoom trên map
 const deltas = {
   latitudeDelta: 0.0922,
@@ -12,7 +12,7 @@ const deltas = {
 
 //vị trí mặc định (tọa độ + độ zoom) nếu k lấy đc vị trí hiện tại, chổ này là nhà t ở Bình Thạnh :)))
 const defaultRegion = {
-  "latitude": 10.804428375990613,  
+  "latitude": 10.804428375990613,
   "longitude": 106.7094463136646,
   "latitudeDelta": 0.09220000000113693,
   "longitudeDelta": 0.05277209033846475,
@@ -24,19 +24,19 @@ export default class HomeScreen extends React.Component {
     this.state = {
       appState: AppState.currentState,
       somePlaces: [], //markers
-      region: null,     
+      region: null,
       search: '',
       targetRegion: null,
       coordinates: [
-				{
-          "latitude": 10.802833237823988,          
+        {
+          "latitude": 10.802833237823988,
           "longitude": 106.70926147909701,
-				},
-				{
-          "latitude": 10.776145446015011,        
-          "longitude": 106.70253285359789,          
-				},
-			],
+        },
+        {
+          "latitude": 10.776145446015011,
+          "longitude": 106.70253285359789,
+        },
+      ],
     }
   }
 
@@ -61,7 +61,9 @@ export default class HomeScreen extends React.Component {
     var _cRegion = await GetCurrentLocation(deltas);
     this.setState({ region: _cRegion ?? defaultRegion });
   }
-
+  onTestPushNotification = async () => {
+    await NotificationCustom._onPushNotificationInternal("Đây là tiêu đề", "Đây là nội dung thông báo");
+  }
   updateSearch = search => {
     this.setState({ search });
   };
@@ -90,6 +92,12 @@ export default class HomeScreen extends React.Component {
         />
 
         <View style={styles.gpsButtonContainer}>
+          <TouchableOpacity
+            style={styles.gpsButton}
+            onPress={() => this.onTestPushNotification()}
+          >
+            <Text style={styles.gpsImgButton}>Push</Text>
+          </TouchableOpacity>
           <TouchableOpacity
             style={styles.gpsButton}
             onPress={() => this.onJumpToMe()}
