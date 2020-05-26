@@ -2,6 +2,7 @@ import * as React from 'react';
 import { View, StyleSheet, Text, AppState, ScrollView, RefreshControl, TouchableOpacity } from 'react-native';
 import * as Helper from "../services/helper";
 import config from "../config";
+import moment from "moment";
 export default class HistoryScreen extends React.Component {
   constructor(props) {
     super(props);
@@ -15,7 +16,7 @@ export default class HistoryScreen extends React.Component {
 
   componentDidMount() {
     const { navigation } = this.props;
-    this._unsubscribe = navigation.addListener('focus', () => {     
+    this._unsubscribe = navigation.addListener('focus', () => {
       this.fetchData();
     });
   }
@@ -23,16 +24,25 @@ export default class HistoryScreen extends React.Component {
   componentWillUnmount() {
     // Remove the event listener
     this._unsubscribe();
-  }  
+  }
 
   fetchData = async () => {
     var data = [];
+    data.reverse
     var dataStr = await Helper.getValueByKey(config.TTL_History);
     if (dataStr && dataStr != "") {
       data = JSON.parse(dataStr);
     }
+
+    const dataDes = data.sort((a, b) =>
+      new moment(new Date(a.createdDate)).format('DD/MM/YYYY HH:mm:ss')
+      -
+      new moment(new Date(b.createdDate)).format('DD/MM/YYYY HH:mm:ss')
+    )
+    .reverse();
+
     this.setState({
-      history: data
+      history: dataDes
     });
   }
 
@@ -43,8 +53,7 @@ export default class HistoryScreen extends React.Component {
     });
   }
 
-  goToMap = (loc) => {
-    console.log(loc);
+  goToMap = (loc) => {   
     this.props.navigation.navigate('Home', { "historyLoc": loc });
   }
 

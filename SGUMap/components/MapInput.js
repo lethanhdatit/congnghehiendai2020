@@ -4,7 +4,7 @@ import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplet
 import config from "../config";
 function MapInput(props) {
     return (
-        <GooglePlacesAutocomplete
+        <GooglePlacesAutocomplete       
             placeholder='Tìm kiếm ở đây'
             minLength={4}
             autoFocus={false}

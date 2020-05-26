@@ -39,11 +39,10 @@ class MapContainer extends React.Component {
     componentDidMount() {
         const { navigation } = this.props;
         this._unsubscribe = navigation.addListener('focus', () => {
-            if(navigation.state.params) {
-                var a = navigation.state.params.historyLoc;
-                console.log(a);
+            if (this.props.route.params) {
+                var loc = this.props.route.params.historyLoc;
+                this.onPrepareToDirection(loc);
             }
-          
         });
         AppState.addEventListener('change', this._handleAppStateChange);
         this.onJumpToMe();
@@ -68,9 +67,14 @@ class MapContainer extends React.Component {
     }
 
     getCoordsFromName = async (details) => {
+        this.onPrepareToDirection(details.geometry.location);
+        this.onSaveHistory(details);
+    }
+
+    onPrepareToDirection = (location) => {
         var _destinationRegion = {
-            latitude: details.geometry.location.lat,
-            longitude: details.geometry.location.lng,
+            latitude: location.lat,
+            longitude: location.lng,
             ...deltas
         };
         this.setState({
@@ -80,24 +84,23 @@ class MapContainer extends React.Component {
             //visibleDirectionDialog: false,
             isShowDirectionButton: true
         });
-        this.onSaveHistory(details);
     }
 
     onSaveHistory = async (details) => {
         var now = new Date();
-        var model = {
+        var model = {           
             name: details.name,
             formatted_address: details.formatted_address,
             location: details.geometry.location,
-            createdDate: `${moment(now).format('MMM Do YYYY HH:mm:ss')}`
+            createdDate: `${moment(now).format('DD/MM/YYYY HH:mm:ss')}`
         }
-        var data = [];
+        var data = [];       
         var dataStr = await Helper.getValueByKey(config.TTL_History);
         if (dataStr && dataStr != "") {
             data = JSON.parse(dataStr);
         }
         var isExist = this.checkIsExistAddress(data, model);
-        if (!isExist) {
+        if (!isExist) {           
             data.push(model);
             var _dataStr = JSON.stringify(data);
             await Helper.storeKeyData(config.TTL_History, _dataStr);
@@ -141,7 +144,7 @@ class MapContainer extends React.Component {
         })
     }
     render() {
-
+        // var magic = new Date().toISOString();
         return (
             <View style={styles.container}>
                 <View style={styles.mapViewContainer}>
@@ -157,7 +160,10 @@ class MapContainer extends React.Component {
                 </View>
 
                 <View style={styles.searchBarContainer}>
-                    <MapInput notifyChange={(details) => this.getCoordsFromName(details)} />
+                    <MapInput                        
+                        /*{key={magic}}*/
+                        notifyChange={(details) => this.getCoordsFromName(details)}
+                    />
                 </View>
 
                 <View style={styles.gpsButtonContainer}>
