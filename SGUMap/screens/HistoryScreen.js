@@ -45,6 +45,7 @@ export default class HistoryScreen extends React.Component {
 
   goToMap = (loc) => {
     console.log(loc);
+    this.props.navigation.navigate('Home', { "historyLoc": loc });
   }
 
   render() {
