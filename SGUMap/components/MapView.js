@@ -46,8 +46,11 @@ export default class MyMapView extends React.Component {
                 style={styles.mapStyle}
                 initialRegion={region}
                 showsUserLocation={true}
+                showsMyLocationButton={true}
                 followsUserLocation={followsUserLocation}
-                //onRegionChange={(r) => console.log(r)}
+                //userLocationAnnotationTitle={"Testing"}
+                showsCompass={true}
+                onUserLocationChange={locationChangedResult => this.props.callBackUserLocation(locationChangedResult.nativeEvent.coordinate)}
                 loadingEnabled={true}
                 ref={ref => { this.map = ref; }}
             >
@@ -61,6 +64,7 @@ export default class MyMapView extends React.Component {
                         origin={originRegion}
                         destination={destinationRegion}
                         apikey={config.GOOGLE_MAPS_APIKEY}
+                        resetOnChange={true}
                         precision='high'
                         timePrecision='now'
                         strokeWidth={3}

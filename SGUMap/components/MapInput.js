@@ -12,7 +12,7 @@ function MapInput(props) {
             listViewDisplayed='auto'   
             fetchDetails={true}
             onPress={(data, details = null) => { 
-                props.notifyChange(details.geometry.location);
+                props.notifyChange(details);                
             }}
             query={{
                 key: config.GOOGLE_PLACES_APIKEY,

@@ -3,7 +3,9 @@ import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Image, AppState }
 import MapInput from '../components/MapInput';
 import MyMapView from '../components/MapView';
 import GetCurrentLocation from '../components/Location';
-
+import * as Helper from "../services/helper";
+import config from "../config";
+import moment from "moment";
 // Độ zoom trên map
 const deltas = {
     "latitudeDelta": 0.007427427841413703,
@@ -29,18 +31,28 @@ class MapContainer extends React.Component {
             directionResult: null,
             followsUserLocation: false,
             visibleDirectionDialog: false,
-            isShowDirectionButton: false
+            isShowDirectionButton: false,
+            userLocation: null
         };
     }
 
     componentDidMount() {
-        this._isMounted = true;
+        const { navigation } = this.props;
+        this._unsubscribe = navigation.addListener('focus', () => {
+            if(navigation.state.params) {
+                var a = navigation.state.params.historyLoc;
+                console.log(a);
+            }
+          
+        });
         AppState.addEventListener('change', this._handleAppStateChange);
         this.onJumpToMe();
+        //await Helper.storeKeyData(config.TTL_History, "");
     }
 
     componentWillUnmount() {
         AppState.removeEventListener('change', this._handleAppStateChange);
+        this._unsubscribe();
     }
 
     _handleAppStateChange = nextAppState => {
@@ -55,10 +67,10 @@ class MapContainer extends React.Component {
         this.setState({ region: _cRegion ?? defaultRegion });
     }
 
-    getCoordsFromName = async (loc) => {
+    getCoordsFromName = async (details) => {
         var _destinationRegion = {
-            latitude: loc.lat,
-            longitude: loc.lng,
+            latitude: details.geometry.location.lat,
+            longitude: details.geometry.location.lng,
             ...deltas
         };
         this.setState({
@@ -67,6 +79,34 @@ class MapContainer extends React.Component {
             isStartDirection: false,
             //visibleDirectionDialog: false,
             isShowDirectionButton: true
+        });
+        this.onSaveHistory(details);
+    }
+
+    onSaveHistory = async (details) => {
+        var now = new Date();
+        var model = {
+            name: details.name,
+            formatted_address: details.formatted_address,
+            location: details.geometry.location,
+            createdDate: `${moment(now).format('MMM Do YYYY HH:mm:ss')}`
+        }
+        var data = [];
+        var dataStr = await Helper.getValueByKey(config.TTL_History);
+        if (dataStr && dataStr != "") {
+            data = JSON.parse(dataStr);
+        }
+        var isExist = this.checkIsExistAddress(data, model);
+        if (!isExist) {
+            data.push(model);
+            var _dataStr = JSON.stringify(data);
+            await Helper.storeKeyData(config.TTL_History, _dataStr);
+        }
+    }
+
+    checkIsExistAddress(array, model) {
+        return array.find((item) => {
+            return item.location.lat === model.location.lat && item.location.lng === model.location.lng;
         });
     }
 
@@ -91,25 +131,33 @@ class MapContainer extends React.Component {
             directionResult: result
         });
     }
+    callBackUserLocation = (result) => {
+        this.setState({
+            userLocation: {
+                latitude: result.latitude,
+                longitude: result.longitude,
+                ...deltas
+            }
+        })
+    }
     render() {
-        var magic = new Date().toLocaleTimeString();
+
         return (
             <View style={styles.container}>
-
                 <View style={styles.mapViewContainer}>
                     <MyMapView
-                        //key={magic}
                         region={this.state.region ?? defaultRegion}
                         originRegion={this.state.originRegion}
                         destinationRegion={this.state.destinationRegion}
                         isStartDirection={this.state.isStartDirection}
                         followsUserLocation={this.state.followsUserLocation}
                         callBackDirectionResult={this.callBackDirectionResult}
+                        callBackUserLocation={this.callBackUserLocation}
                     />
                 </View>
 
                 <View style={styles.searchBarContainer}>
-                    <MapInput notifyChange={(loc) => this.getCoordsFromName(loc)} />
+                    <MapInput notifyChange={(details) => this.getCoordsFromName(details)} />
                 </View>
 
                 <View style={styles.gpsButtonContainer}>
@@ -141,13 +189,23 @@ class MapContainer extends React.Component {
                         <View style={styles.modalContent}>
                             {
                                 this.state.directionResult &&
-                                <View style={{ flexDirection: 'row'}}>                                    
-                                    <Text style={{color: 'green', fontWeight: 'bold'}}> {(Math.round(this.state.directionResult.duration * 100) / 100)}</Text>
-                                    <Text style={{color: 'green'}}> phút </Text>
-                                    <Text style={{color: 'gray', fontWeight: 'bold'}}>( {(Math.round(this.state.directionResult.distance * 100) / 100)}</Text>
-                                    <Text style={{color: 'gray'}}> km )</Text>                             
+                                <View style={{ flexDirection: 'row' }}>
+                                    <Text style={{ color: 'green', fontWeight: 'bold' }}> {(Math.round(this.state.directionResult.duration * 100) / 100)}</Text>
+                                    <Text style={{ color: 'green' }}> phút </Text>
+                                    <Text style={{ color: 'gray', fontWeight: 'bold' }}>( {(Math.round(this.state.directionResult.distance * 100) / 100)}</Text>
+                                    <Text style={{ color: 'gray' }}> km )</Text>
                                 </View>
                             }
+                        </View>
+                    </View>
+                }
+                {
+                    this.state.userLocation &&
+                    <View style={styles.bottomModal}>
+                        <View style={styles.modalContent}>
+                            <View style={{ flexDirection: 'row' }}>
+                                <Text style={{ color: 'green', fontWeight: 'bold' }}>{JSON.stringify(this.state.userLocation)}</Text>
+                            </View>
                         </View>
                     </View>
                 }
@@ -202,7 +260,7 @@ const styles = StyleSheet.create({
     bottomModal: {
         justifyContent: 'flex-end',
     },
-    modalContent: {       
+    modalContent: {
         backgroundColor: 'white',
         padding: 11,
         justifyContent: 'center',
