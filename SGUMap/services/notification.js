@@ -4,7 +4,19 @@ import * as Helper from "./helper";
 import * as Permissions from "expo-permissions";
 import { Notifications, Linking } from "expo";
 import * as IntentLauncher from "expo-intent-launcher";
+import firebase from '../services/fireBase';
 import Constants from "expo-constants";
+
+export function saveTokenIntoFireBase(name, token){
+  firebase.database().ref('userTokens/').push({
+      name,
+      token
+  }).then((data) => {
+      console.log('data ' , data)
+  }).catch((error) => {
+      console.log('error ' , error)
+  })
+}
 
 export async function _onRequestNotificationsAsync() {
   var isSkipped = (await Helper.getValueByKey(config.TTL_IsSkipNotification)) === "true";
@@ -23,6 +35,7 @@ export async function _onRequestNotificationsAsync() {
     //console.log(token);
     if (token) {
       await Helper.storeKeyData(config.TTL_Notification_Token, token);
+      saveTokenIntoFireBase(Constants.deviceName, token)
       _OnRunAppWithAllowedNoti();
     }
     else {

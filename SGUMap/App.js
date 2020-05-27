@@ -7,7 +7,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as NotificationCustom from './services/notification';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
-
+import * as Helper from "./services/helper";
+import config from "./config";
 const Stack = createStackNavigator();
 
 export default class App extends React.Component {
@@ -25,6 +26,7 @@ export default class App extends React.Component {
   componentDidMount() {
     this._isMounted = true;
     AppState.addEventListener('change', this._handleAppStateChange);
+    //await Helper.storeKeyData(config.TTL_Notification_Token, "");
     NotificationCustom._onRequestNotificationsAsync();
     this._notificationSubscription = Notifications.addListener(this._handleNotification);
   }
