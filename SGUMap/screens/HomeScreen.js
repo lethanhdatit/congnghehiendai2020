@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity, Text, Image, AppState } from 'react-native';
 import MapInput from '../components/MapInput';
 import MyMapView from '../components/MapView';
-import GetCurrentLocation from '../components/Location';
+import GetCurrentLocation from '../services/location';
 import * as Helper from "../services/helper";
 import config from "../config";
 import moment from "moment";
@@ -121,10 +121,6 @@ class MapContainer extends React.Component {
                 isStartDirection: true
             });
         }
-    }
-
-    onTestPushNotification = async () => {
-        await NotificationCustom._onPushNotificationInternal("Đây là tiêu đề", "Đây là nội dung thông báo");
     }
 
     callBackDirectionResult = (result) => {

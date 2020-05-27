@@ -21,9 +21,7 @@ export default class MyMapView extends React.Component {
     }
 
     onDirectionReady = (result) => {
-        // console.log(`Distance: ${result.distance} km`)
-        // console.log(`Duration: ${result.duration} min.`)
-
+        
         this.map.fitToCoordinates(result.coordinates, {
             edgePadding: {
                 right: (styles.mapStyle.width / 20),
@@ -70,8 +68,7 @@ export default class MyMapView extends React.Component {
                         strokeWidth={3}
                         strokeColor="#518EFB" //Mau giong cua google map //color line: 518EFB //border color: 506BD0                        
                         optimizeWaypoints={true}
-                        onStart={(params) => {
-                            // console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
+                        onStart={(params) => {                            
                         }}
                         onReady={this.onDirectionReady}
                         onError={this.onDirectionError}

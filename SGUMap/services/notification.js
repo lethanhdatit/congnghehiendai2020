@@ -1,6 +1,6 @@
 import config from "../config";
 import { Platform, Alert, BackHandler } from "react-native";
-import * as Helper from "../services/helper";
+import * as Helper from "./helper";
 import * as Permissions from "expo-permissions";
 import { Notifications, Linking } from "expo";
 import * as IntentLauncher from "expo-intent-launcher";
